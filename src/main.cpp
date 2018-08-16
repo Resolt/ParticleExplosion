@@ -1,46 +1,46 @@
 #include <iostream>
 
-#include <SDL2/SDL.h>
-
-const size_t SCREEN_WIDTH = 800;
-const size_t SCREEN_HEIGHT = 600;
+#include "Util.hpp"
+#include "Graphics.hpp"
 
 int main()
 {
-	// INIT SDL
-	int sdlinit = SDL_Init(SDL_INIT_VIDEO);
-	if(sdlinit < 0)
-	{
-		std::cout << "SDL INIT FAILED : " << sdlinit << std::endl;
-		return 1;
-	}
-	else
-	{
-		std::cout << "SDL INIT SUCCEEDED" << std::endl;
-	}
+	// SET UP SIG HANDLER
+	struct sigaction sigIntHandler;
+	sigIntHandler.sa_handler = util::mySigHandler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
 
-	// OPEN UP A WINDOW
-	SDL_Window *window = SDL_CreateWindow(
-		"LULZ",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN
-	);
+	// START SOME GRAPHICS
+	graphics::Screen *screen = new graphics::Screen;
+	screen->init();
 
-	// CHECK THE WINDOWS STATUS
-	if(window == NULL)
+	bool quit = false;
+	SDL_Event event;
+
+	while(!quit)
 	{
-		std::cout << "Window couldn't open : " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		return 2;
+		// HANDLE SIGNALS
+		sigaction(SIGINT, &sigIntHandler, NULL);
+
+		while(SDL_PollEvent(&event))
+		{
+			// HANDLE SDL EVENTS
+			if(event.type == SDL_QUIT)
+			{
+				quit = true;
+				continue;
+			}
+		}
 	}
 
 	// 3 SECOND DELAY
-	SDL_Delay(3000);
+	// SDL_Delay(3000);
 
-	// QUIT SDL AND RETURN
+	// DESTROY WINDOW
+	// SDL_DestroyWindow(window);
+	// QUIT SDL
 	SDL_Quit();
+
 	return 0;
 }

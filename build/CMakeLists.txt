@@ -10,6 +10,7 @@ SET(CMAE_C_STANDARD 11)
 
 ADD_EXECUTABLE(${PROJECT_NAME}
   ../src/main.cpp
+	../src/Graphics.cpp
 )
 
 INCLUDE_DIRECTORIES(
