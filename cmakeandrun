@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cd build
+rm -r CMakeFiles
+rm CMakeCache.txt Makefile
+
+cmake .
+
+make
+
+cd ..
+
+echo "$STR"
+
+./bin/parex
