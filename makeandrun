@@ -1,11 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 cd build
 
 make
-
-cd ..
+MAKERETURN=$?
 
 echo "$STR"
+echo "Make return code: $MAKERETURN"
 
-./bin/parex
+if [ $MAKERETURN -eq 0 ]
+then
+	echo "$STR"
+	../bin/parex
+fi

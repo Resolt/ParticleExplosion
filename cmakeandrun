@@ -1,15 +1,25 @@
-#!/bin/sh
+#!/bin/bash
 
 cd build
-rm -r CMakeFiles
-rm CMakeCache.txt Makefile
+rm -r CMakeFiles CMakeCache.txt Makefile
 
 cmake .
-
-make
-
-cd ..
+CMAKERETURN=$?
 
 echo "$STR"
+echo "CMake return code: $CMAKERETURN"
 
-./bin/parex
+if [ $CMAKERETURN -eq 0 ] || [ $CMAKERETURN -eq 1 ]
+then
+	make
+	MAKERETURN=$?
+
+	echo "$STR"
+	echo "Make return code: $MAKERETURN"
+
+	if [ $MAKERETURN -eq 0 ]
+	then
+		echo "$STR"
+		../bin/parex
+	fi
+fi
