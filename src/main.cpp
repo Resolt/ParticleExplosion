@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Util.hpp"
 #include "Graphics.hpp"
 
@@ -12,34 +10,33 @@ int main()
 	sigIntHandler.sa_flags = 0;
 
 	// START SOME GRAPHICS
-	graphics::Screen *screen = new graphics::Screen;
-	screen->init();
+	graphics::Screen *screen = new graphics::Screen("YEAHPLAYAH");
+	if(!screen->init())
+	{
+		std::cout << "Couldn't create screen" << std::endl;
+		delete screen;
+		return 2;
+	}
 
 	bool quit = false;
-	SDL_Event event;
+
+	// SET COLOUR
+	Uint32 c = 0x0FF0FF00;
+	screen->makeColour(c, screen->getBuffer1());
 
 	while(!quit)
 	{
 		// HANDLE SIGNALS
 		sigaction(SIGINT, &sigIntHandler, NULL);
 
-		while(SDL_PollEvent(&event))
-		{
-			// HANDLE SDL EVENTS
-			if(event.type == SDL_QUIT)
-			{
-				quit = true;
-				continue;
-			}
-		}
+		quit = screen->processEvents();
+
+		// WAIT FOR AN AMOUNT OF MILISECONDS
+		SDL_Delay(25);
 	}
 
-	// 3 SECOND DELAY
-	// SDL_Delay(3000);
+	delete screen;
 
-	// DESTROY WINDOW
-	// SDL_DestroyWindow(window);
-	// QUIT SDL
 	SDL_Quit();
 
 	return 0;
