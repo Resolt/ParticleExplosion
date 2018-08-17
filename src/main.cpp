@@ -9,50 +9,42 @@ int main()
 	sigemptyset(&sigIntHandler.sa_mask);
 	sigIntHandler.sa_flags = 0;
 
- // SEED RAND
+	// SEED RAND
 	srand(time(NULL));
 
 	// START SOME GRAPHICS
-	graphics::Screen *screen = new graphics::Screen("Windows Media Player Animation And Shit");
-	if(!screen->init())
+	graphics::Screen screen("Windows Media Player Animation And Shit");
+	if(!screen.init())
 	{
 		std::cout << "Couldn't create screen" << std::endl;
-		delete screen;
 		SDL_Quit();
 		return 2;
 	}
 
 	bool quit = false;
 
-	screen->makePlainColour(0, 0, 0);
-	screen->update();
+	graphics::Swarm swarm;
 
-	graphics::Swarm *swarm = new graphics::Swarm;
-
-	graphics::Particle * const pParticles = swarm->getParticles();
+	// MAKE SCREEN BLACK
+	screen.makePlainColour(0, 0, 0);
 
 	while(!quit)
 	{
 		// HANDLE SIGNALS
 		sigaction(SIGINT, &sigIntHandler, NULL);
 
-		quit = screen->processEvents();
+		quit = screen.processEvents();
 
-		for(size_t i = 0; i < swarm->NPARTICLES; i++)
-		{
-			pParticles[i].updateColour();
-			screen->setPixel(Uint16(pParticles[i].pos_x), Uint16(pParticles[i].pos_y), pParticles[i].getColour());
-		}
-		screen->update();
+		// UPDATE THE PIXELS
+		swarm.updatePositions();
+		swarm.updateColours();
+		screen.drawParticles(swarm.getParticles());
 
 		// WAIT FOR AN AMOUNT OF MILISECONDS
-		// SDL_Delay(25);
+		SDL_Delay(25);
 	}
 
-	delete screen;
-	delete swarm;
-
-	SDL_Quit();
+	screen.close();
 
 	return 0;
 }

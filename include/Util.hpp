@@ -11,7 +11,7 @@ namespace util {
 	void mySigHandler(int s)
 	{
 		std::cout << "Caught signal " << s << std::endl;
-		exit(1);
+		exit(2);
 	}
 
 }

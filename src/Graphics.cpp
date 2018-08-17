@@ -108,16 +108,21 @@ void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour)
 	this->m_buffer[(y * SCREEN_WIDTH) + x] = colour;
 }
 
-// PARTICLE
-
-Particle::Particle()
+void Screen::drawParticles(const Particle *pParticles)
 {
-
+	for(size_t i = 0; i < Swarm::NPARTICLES; i++)
+	{
+		this->setPixel((Uint16)round(pParticles[i].pos_x), (Uint16)round(pParticles[i].pos_y), pParticles[i].getColour());
+	}
+	this->update();
 }
+
+// PARTICLE
 
 void Particle::updateColour()
 {
 	int ticks = SDL_GetTicks();
+
 	Uint8 green = Uint8((1 + cos(ticks * 0.0001)) * 128);
 	Uint8 red = Uint8((1 + cos(ticks * 0.0002)) * 128);
 	Uint8 blue = Uint8((1 + cos(ticks * 0.0003)) * 128);
@@ -125,11 +130,41 @@ void Particle::updateColour()
 	this->colour = formatColour(red, green, blue);
 }
 
+void Particle::updatePos()
+{
+	// UPDATE DIRECTION RADIAN BASED ON HORISONTAL MOVEMENT
+	if(this->pos_x <= this->velocity || this->pos_x >= (double)SCREEN_WIDTH-1-this->velocity)
+	{
+		this->rad = M_PI - this->rad;
+	}
+
+	// UPDATE DIRECTION RADIAN BASED ON VERTICAL MOVEMENT
+	if(this->pos_y <= this->velocity || this->pos_y >= (double)SCREEN_HEIGHT-1-this->velocity)
+	{
+		this->rad = (2 * M_PI) - this->rad;
+	}
+
+	// UPDATE POSITION
+	this->pos_x += cos(this->rad) * (double)this->velocity;
+	this->pos_y += sin(this->rad) * (double)this->velocity;
+}
+
 // SWARM
 
-Swarm::Swarm()
+void Swarm::updatePositions()
 {
+	for(size_t i = 0; i < NPARTICLES; i++)
+	{
+		m_particles[i].updatePos();
+	}
+}
 
+void Swarm::updateColours()
+{
+	for(size_t i = 0; i < NPARTICLES; i++)
+	{
+		m_particles[i].updateColour();
+	}
 }
 
 } /*namespace graphics*/
