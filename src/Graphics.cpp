@@ -2,6 +2,21 @@
 
 namespace graphics {
 
+Uint32 formatColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue)
+{
+	Uint32 colour = 0;
+
+	colour += red;
+	colour <<= 8;
+	colour += green;
+	colour <<= 8;
+	colour += blue;
+	colour <<= 8;
+	colour += 0xFF;
+
+	return colour;
+}
+
 bool Screen::init()
 {
 	m_window = NULL;
@@ -35,8 +50,7 @@ bool Screen::init()
 		return false;
 	}
 
-	m_buffer1 = new Uint32[PIXELS];
-	m_buffer2 = new Uint32[PIXELS];
+	m_buffer = new Uint32[PIXELS];
 
 	return true;
 };
@@ -56,32 +70,43 @@ bool Screen::processEvents()
 	return false;
 }
 
+void Screen::update()
+{
+	SDL_UpdateTexture(this->m_texture, NULL, this->m_buffer, MEMSIZEROW);
+	// SDL_RenderClear(this->m_renderer); // I'M SOMEWHAT SURE THAT THIS IN MANY CASES IS RATHER UNNECESSARY
+	SDL_RenderCopy(this->m_renderer, this->m_texture, NULL, NULL);
+	SDL_RenderPresent(this->m_renderer);
+}
+
 void Screen::makeGreyScale(const short &a)
 {
-	memset(this->m_buffer1, a, MEMSIZE);
-	SDL_UpdateTexture(this->m_texture, NULL, this->m_buffer1, MEMSIZEROW);
-	// SDL_RenderClear(this->m_renderer);
-	SDL_RenderCopy(this->m_renderer, this->m_texture, NULL, NULL);
-	SDL_RenderPresent(this->m_renderer);
+	memset(this->m_buffer, a, MEMSIZE);
 }
 
-void Screen::makeColour(const Uint32 &c, Uint32 *buffer)
+void Screen::makePlainColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue)
 {
+
+	Uint32 colour = formatColour(red, green, blue);
+
 	for(size_t i = 0; i < PIXELS; i ++)
 	{
-		buffer[i] = c;
+		this->m_buffer[i] = colour;
 	}
-	SDL_UpdateTexture(this->m_texture, NULL, buffer, MEMSIZEROW);
-	SDL_RenderCopy(this->m_renderer, this->m_texture, NULL, NULL);
-	SDL_RenderPresent(this->m_renderer);
 }
 
-void Screen::setPixel(const size_t &bufferpos, const Uint32 &a, Uint32 *buffer)
+void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue)
 {
-	buffer[bufferpos] = a;
-	SDL_UpdateTexture(this->m_texture, NULL, buffer, MEMSIZEROW);
-	SDL_RenderCopy(this->m_renderer, this->m_texture, NULL, NULL);
-	SDL_RenderPresent(this->m_renderer);
+	this->m_buffer[(y * SCREEN_WIDTH) + x] = formatColour(red, green, blue);
+}
+
+void Particle::updateColour()
+{
+	int ticks = SDL_GetTicks();
+	Uint8 green = Uint8((1 + cos(ticks * 0.0001)) * 128);
+	Uint8 red = Uint8((1 + cos(ticks * 0.0002)) * 128);
+	Uint8 blue = Uint8((1 + cos(ticks * 0.0003)) * 128);
+
+	this->colour = formatColour(red, green, blue);
 }
 
 } /*namespace graphics*/

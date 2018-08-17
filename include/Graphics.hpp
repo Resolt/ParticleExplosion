@@ -2,10 +2,13 @@
 #define GRAPHICS_HPP
 
 #include <string>
+#include <math.h>
 
 #include <SDL2/SDL.h>
 
 namespace graphics {
+
+Uint32 formatColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
 
 class Screen {
 
@@ -25,10 +28,7 @@ class Screen {
 		SDL_Texture* m_texture;
 		SDL_Event event;
 
-		Uint32* m_buffer1;
-		Uint32* m_buffer2;
-		Uint32* m_frontBuffer;
-		Uint32* m_backBuffer;
+		Uint32* m_buffer;
 
 		std::string SCREEN_NAME;
 
@@ -39,26 +39,50 @@ class Screen {
 
 		SDL_Window* getWindow() const { return this->m_window; };
 
-		Uint32* getBuffer1() { return this->m_buffer1; };
-		Uint32* getBuffer2() { return this->m_buffer2; };
+		Uint32* getBuffer() { return this->m_buffer; };
 
 		Screen(const std::string &sn) { this->SCREEN_NAME = sn; };
 		~Screen() {
 			SDL_DestroyTexture(this->m_texture);
 			SDL_DestroyRenderer(this->m_renderer);
 			SDL_DestroyWindow(this->m_window);
-			delete [] m_buffer1;
-			delete [] m_buffer2;
-			delete [] m_frontBuffer;
-			delete [] m_backBuffer;
+			delete [] m_buffer;
 		};
 
 		// IMPLEMENTATION IN CPP FILE
 		bool init();
 		bool processEvents();
+		void update();
 		void makeGreyScale(const short &a);
-		void makeColour(const Uint32 &c, Uint32 *buffer);
-		void setPixel(const size_t &bufferpos, const Uint32 &a, Uint32 *buffer);
+		void makePlainColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
+		void setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue);
+
+};
+
+class Particle {
+
+	private:
+		double pos_x;
+		double pos_y;
+		Uint32 colour;
+
+	public:
+		Particle(const double &x, const double &y):
+			pos_x(x),
+			pos_y(y)
+		{
+			this->updateColour();
+		};
+		void updateColour();
+};
+
+class Swarm {
+
+	private:
+
+
+	public:
+
 
 };
 

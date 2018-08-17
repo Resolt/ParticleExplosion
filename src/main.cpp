@@ -10,19 +10,19 @@ int main()
 	sigIntHandler.sa_flags = 0;
 
 	// START SOME GRAPHICS
-	graphics::Screen *screen = new graphics::Screen("YEAHPLAYAH");
+	graphics::Screen *screen = new graphics::Screen("Windows Media Player Animation And Shit");
 	if(!screen->init())
 	{
 		std::cout << "Couldn't create screen" << std::endl;
 		delete screen;
+		SDL_Quit();
 		return 2;
 	}
 
 	bool quit = false;
 
-	// SET COLOUR
-	Uint32 c = 0x0FF0FF00;
-	screen->makeColour(c, screen->getBuffer1());
+	screen->makePlainColour(255, 255, 0);
+	screen->update();
 
 	while(!quit)
 	{
@@ -32,7 +32,7 @@ int main()
 		quit = screen->processEvents();
 
 		// WAIT FOR AN AMOUNT OF MILISECONDS
-		SDL_Delay(25);
+		// SDL_Delay(25);
 	}
 
 	delete screen;
