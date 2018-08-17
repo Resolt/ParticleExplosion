@@ -149,6 +149,20 @@ void Particle::updatePos()
 	this->pos_y += sin(this->rad) * (double)this->velocity;
 }
 
+void Particle::setPos(const bool &explosion)
+{
+	if(explosion)
+	{
+		this->pos_x = ((double)rand()/(double)RAND_MAX) * (double)SCREEN_WIDTH * 0.05 + (double)SCREEN_WIDTH / 2.1;
+		this->pos_y = ((double)rand()/(double)RAND_MAX) * (double)SCREEN_HEIGHT * 0.05 + (double)SCREEN_HEIGHT / 2.1;
+	}
+	else
+	{
+		this->pos_x = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_WIDTH - 1 - velocity*2) + velocity; // SET RANDOM POSITION
+		this->pos_y = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_HEIGHT - 1 - velocity*2) + velocity;
+	}
+}
+
 // SWARM
 
 void Swarm::updatePositions()

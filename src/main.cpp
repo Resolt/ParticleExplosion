@@ -23,7 +23,7 @@ int main()
 
 	bool quit = false;
 
-	graphics::Swarm swarm;
+	graphics::Swarm swarm(true);
 
 	// MAKE SCREEN BLACK
 	screen.makePlainColour(0, 0, 0);
@@ -38,10 +38,11 @@ int main()
 		// UPDATE THE PIXELS
 		swarm.updatePositions();
 		swarm.updateColours();
+		memset(screen.getBuffer(), 0, graphics::Screen::MEMSIZE);
 		screen.drawParticles(swarm.getParticles());
 
 		// WAIT FOR AN AMOUNT OF MILISECONDS
-		SDL_Delay(25);
+		SDL_Delay(33);
 	}
 
 	screen.close();

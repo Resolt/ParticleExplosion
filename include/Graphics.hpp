@@ -23,16 +23,17 @@ class Particle {
 
 	public:
 
-		double velocity = ((double)rand()/(double)RAND_MAX) * 3;
-		double rad = ((double)rand()/(double)RAND_MAX) * 2 * M_PI;
-		double pos_x = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_WIDTH - 1 - velocity*2) + velocity;
-		double pos_y = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_HEIGHT - 1 - velocity*2) + velocity;
+		double velocity = ((double)rand()/(double)RAND_MAX) * 2.5 + 0.5; // SET VELOCITY BETWEEN 0.5 and 3.0
+		double rad = ((double)rand()/(double)RAND_MAX) * 2 * M_PI; // SET RANDOM DIRECTION OF MOVEMENT
+		double pos_x;
+		double pos_y;
 
 		Particle() {};
 		~Particle() {};
 		void updateColour();
 		void updatePos();
 		void setColour(const Uint8 & red, const Uint8 &green, const Uint8 &blue) { this->colour = formatColour(red, green, blue); };
+		void setPos(const bool &explosion);
 		Uint32 getColour() const { return this->colour; };
 
 };
@@ -47,7 +48,7 @@ class Swarm {
 
 		static const size_t NPARTICLES = 5000;
 
-		Swarm() {};
+		Swarm(const bool &explosion) { for(size_t i = 0; i < NPARTICLES; i++) { m_particles[i].setPos(explosion); }; };
 		~Swarm() { delete [] m_particles; };
 		Particle * const getParticles() const { return m_particles; };
 		void updatePositions();
