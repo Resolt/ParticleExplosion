@@ -2,6 +2,8 @@
 
 namespace graphics {
 
+// FUNCTIONS
+
 Uint32 formatColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue)
 {
 	Uint32 colour = 0;
@@ -16,6 +18,8 @@ Uint32 formatColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue)
 
 	return colour;
 }
+
+// SCREEN
 
 bool Screen::init()
 {
@@ -99,6 +103,18 @@ void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const 
 	this->m_buffer[(y * SCREEN_WIDTH) + x] = formatColour(red, green, blue);
 }
 
+void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour)
+{
+	this->m_buffer[(y * SCREEN_WIDTH) + x] = colour;
+}
+
+// PARTICLE
+
+Particle::Particle()
+{
+
+}
+
 void Particle::updateColour()
 {
 	int ticks = SDL_GetTicks();
@@ -107,6 +123,13 @@ void Particle::updateColour()
 	Uint8 blue = Uint8((1 + cos(ticks * 0.0003)) * 128);
 
 	this->colour = formatColour(red, green, blue);
+}
+
+// SWARM
+
+Swarm::Swarm()
+{
+
 }
 
 } /*namespace graphics*/

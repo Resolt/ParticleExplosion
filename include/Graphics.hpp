@@ -13,16 +13,6 @@ Uint32 formatColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
 class Screen {
 
 	private:
-		static const size_t SCREEN_WIDTH = 800;
-		static const size_t SCREEN_HEIGHT = 600;
-		static const size_t PIXELS = SCREEN_WIDTH * SCREEN_HEIGHT;
-		static const size_t MEMSIZE = PIXELS*sizeof(Uint32);
-		static const size_t MEMSIZEROW = SCREEN_WIDTH*sizeof(Uint32);
-
-		static const short RED_SHIFT = 24;
-		static const short GREEN_SHIFT = 16;
-		static const short BLUE_SHIFT = 8;
-
 		SDL_Window* m_window;
 		SDL_Renderer* m_renderer;
 		SDL_Texture* m_texture;
@@ -33,9 +23,11 @@ class Screen {
 		std::string SCREEN_NAME;
 
 	public:
-		static size_t getScreenWidth() { return SCREEN_WIDTH; };
-		static size_t getScreenHeight() { return SCREEN_HEIGHT; };
-		static size_t getPixels() { return PIXELS; };
+		static const size_t SCREEN_WIDTH = 800;
+		static const size_t SCREEN_HEIGHT = 600;
+		static const size_t PIXELS = SCREEN_WIDTH * SCREEN_HEIGHT;
+		static const size_t MEMSIZE = PIXELS*sizeof(Uint32);
+		static const size_t MEMSIZEROW = SCREEN_WIDTH*sizeof(Uint32);
 
 		SDL_Window* getWindow() const { return this->m_window; };
 
@@ -56,33 +48,37 @@ class Screen {
 		void makeGreyScale(const short &a);
 		void makePlainColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
 		void setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue);
+		void setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour);
 
 };
 
 class Particle {
 
 	private:
-		double pos_x;
-		double pos_y;
 		Uint32 colour;
 
 	public:
-		Particle(const double &x, const double &y):
-			pos_x(x),
-			pos_y(y)
-		{
-			this->updateColour();
-		};
+		double pos_x = ((double)rand()/(double)RAND_MAX) * (double)Screen::SCREEN_WIDTH;
+		double pos_y = ((double)rand()/(double)RAND_MAX) * (double)Screen::SCREEN_HEIGHT;
+
+		Particle();
 		void updateColour();
+		void setColour(const Uint8 & red, const Uint8 &green, const Uint8 &blue) { this->colour = formatColour(red, green, blue); };
+		Uint32 getColour() const { return this->colour; };
+
 };
 
 class Swarm {
 
 	private:
-
+		 Particle * const m_particles = new Particle[NPARTICLES];
 
 	public:
+		static const size_t NPARTICLES = 5000;
 
+		Swarm();
+		virtual ~Swarm() { delete [] m_particles; };
+		Particle * const getParticles() const { return m_particles; };
 
 };
 
