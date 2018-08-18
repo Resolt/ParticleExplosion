@@ -10,8 +10,8 @@
 
 namespace graphics {
 
-static const Uint16 SCREEN_WIDTH = 800;
-static const Uint16 SCREEN_HEIGHT = 600;
+static const Uint16 SCREEN_WIDTH = 1000;
+static const Uint16 SCREEN_HEIGHT = 750;
 
 Uint32 formatColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
 
@@ -116,9 +116,9 @@ class Screen {
 		void blur(Uint32 * srcBuffer, Uint32 * tmpBuffer, Uint32 * destBuffer, const size_t &boxWidth);
 		void makeGreyScale(const short &a);
 		void makePlainColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
-		void setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue, Uint32 * buffer);
-		void setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour, Uint32 * buffer);
-		void drawParticles(const Particle *pParticles, Uint32 * buffer);
+		void setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue, Uint32 * buffer, const size_t &width);
+		void setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour, Uint32 * buffer, const size_t &width);
+		void drawParticles(const Particle *pParticles, Uint32 * buffer, const size_t &width);
 
 };
 

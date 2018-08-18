@@ -120,7 +120,7 @@ void Screen::blur(Uint32 * srcBuffer, Uint32 * tmpBuffer, Uint32 * destBuffer, c
 				}
 			}
 
-			this->setPixel(x, y, redSum/count, greenSum/count, blueSum/count, tmpBuffer);
+			this->setPixel(x, y, redSum/count, greenSum/count, blueSum/count, tmpBuffer, 0);
 		}
 	}
 
@@ -149,23 +149,52 @@ void Screen::makePlainColour(const Uint8 &red, const Uint8 &green, const Uint8 &
 	}
 }
 
-void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue, Uint32 * buffer)
+void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue, Uint32 * buffer, const size_t &width)
 {
-	buffer[(y * SCREEN_WIDTH) + x] = formatColour(red, green, blue);
+	Uint32 colour = formatColour(red, green, blue);
+	if(width < 2)
+	{
+		buffer[(y * SCREEN_WIDTH) + x] = colour;
+	}
+	else
+	{
+		int n = width / 2;
+		for(int t_x = std::max(0, x-n); t_x < std::min((int)SCREEN_WIDTH, x+n); t_x++)
+		{
+			for(int t_y = std::max(0, y-n); t_y < std::min((int)SCREEN_HEIGHT, y+n); t_y++)
+			{
+				buffer[(t_y * SCREEN_WIDTH) + t_x] = colour;
+			}
+		}
+	}
 }
 
-void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour, Uint32 * buffer)
+void Screen::setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour, Uint32 * buffer, const size_t &width)
 {
-	buffer[(y * SCREEN_WIDTH) + x] = colour;
+	if(width < 2)
+	{
+		buffer[(y * SCREEN_WIDTH) + x] = colour;
+	}
+	else
+	{
+		int n = width / 2;
+		for(int t_x = std::max(0, x-n); t_x < std::min((int)SCREEN_WIDTH, x+n); t_x++)
+		{
+			for(int t_y = std::max(0, y-n); t_y < std::min((int)SCREEN_HEIGHT, y+n); t_y++)
+			{
+				buffer[(t_y * SCREEN_WIDTH) + t_x] = colour;
+			}
+		}
+	}
 }
 
-void Screen::drawParticles(const Particle *pParticles, Uint32 * buffer)
+void Screen::drawParticles(const Particle *pParticles, Uint32 * buffer, const size_t &width)
 {
 	for(size_t i = 0; i < Swarm::NPARTICLES; i++)
 	{
 		if(!pParticles[i].isOut)
 		{
-			this->setPixel((Uint16)round(pParticles[i].pos_x), (Uint16)round(pParticles[i].pos_y), pParticles[i].getColour(), buffer);
+			this->setPixel((Uint16)round(pParticles[i].pos_x), (Uint16)round(pParticles[i].pos_y), pParticles[i].getColour(), buffer, width);
 		}
 	}
 }

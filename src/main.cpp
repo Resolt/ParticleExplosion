@@ -3,15 +3,8 @@
 
 int main()
 {
-	// SET UP SIG HANDLER
-	struct sigaction sigIntHandler;
-	sigIntHandler.sa_handler = util::mySigHandler;
-	sigemptyset(&sigIntHandler.sa_mask);
-	sigIntHandler.sa_flags = 0;
-	sigaction(SIGINT, &sigIntHandler, NULL);
-
-	// SEED RAND
-	srand(time(NULL));
+	util::setSig();
+	util::seedRand();
 
 	// START SOME GRAPHICS
 	graphics::Screen screen("Windows Media Player Animation And Shit");
@@ -44,7 +37,7 @@ int main()
 		pel = cel;
 		if(tick > 1000)
 		{
-			std::cout << "FPS: " << (double)count/((double)tick/1000) << std::endl;
+			std::cout << "\rFPS: " << (double)count/((double)tick/1000) << std::flush;
 			tick = 0;
 			count = 0;
 		}
@@ -56,11 +49,13 @@ int main()
 		swarm.updatePositions();
 		swarm.updateColours();
 		// memset(screen.getBuffer1(), 0, graphics::Screen::MEMSIZE);
-		screen.drawParticles(swarm.getParticles(), screen.getBuffer1());
+		screen.drawParticles(swarm.getParticles(), screen.getBuffer1(), 3);
 		// memset(screen.getBuffer2(), 0, graphics::Screen::MEMSIZE);
 		screen.blur(screen.getBuffer1(), screen.getBuffer2(), screen.getBuffer1(), 3);
 		screen.update(screen.getBuffer1());
 	}
+
+	std::cout << std::endl;
 
 	screen.close();
 

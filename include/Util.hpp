@@ -14,6 +14,22 @@ namespace util {
 		exit(2);
 	}
 
+	void setSig()
+	{
+		// SET UP SIG HANDLER
+		struct sigaction sigIntHandler;
+		sigIntHandler.sa_handler = util::mySigHandler;
+		sigemptyset(&sigIntHandler.sa_mask);
+		sigIntHandler.sa_flags = 0;
+		sigaction(SIGINT, &sigIntHandler, NULL);
+	}
+
+	void seedRand()
+	{
+		// SEED RAND
+		srand(time(NULL));
+	}
+
 }
 
 #endif
