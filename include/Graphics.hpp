@@ -19,7 +19,7 @@ class Particle {
 
 	private:
 
-		static constexpr double speedMod = 0.05;
+		static constexpr double speedMod = 0.005;
 
 		Uint32 colour;
 
@@ -38,7 +38,9 @@ class Particle {
 		~Particle() {};
 		void init(const bool &explosion);
 		void updateColour();
-		void updatePos(const size_t &tdiff);
+		void updatePosLinear(const size_t &tdiff, const bool &border);
+		void updatePosVortex(const size_t &tdiff, const bool &border);
+		void updatePosPortal(const size_t &tdiff);
 		void setColour(const Uint8 & red, const Uint8 &green, const Uint8 &blue) { this->colour = formatColour(red, green, blue); };
 		Uint32 getColour() const { return this->colour; };
 
@@ -52,13 +54,16 @@ class Swarm {
 		Uint32 elapsed = SDL_GetTicks();
 		size_t tdiff;
 
+		bool border;
+		size_t mode;
+
 		void updateElapsed();
 
 	public:
 
-		static const size_t NPARTICLES = 30000;
+		static const size_t NPARTICLES = 2000;
 
-		Swarm(const bool &explosion) { for(size_t i = 0; i < NPARTICLES; i++) { m_particles[i].init(explosion); }; };
+		Swarm(const bool &explosion, const bool &border, const size_t &mode): border(border), mode(mode) { for(size_t i = 0; i < NPARTICLES; i++) { m_particles[i].init(explosion); }; };
 		~Swarm() { delete [] m_particles; };
 		Particle * const getParticles() const { return m_particles; };
 		void updatePositions();
@@ -75,7 +80,8 @@ class Screen {
 		SDL_Texture* m_texture;
 		SDL_Event event;
 
-		Uint32* m_buffer;
+		Uint32* m_buffer1;
+		Uint32* m_buffer2;
 
 		std::string SCREEN_NAME;
 
@@ -87,11 +93,13 @@ class Screen {
 
 		SDL_Window* getWindow() const { return this->m_window; };
 
-		Uint32* getBuffer() { return this->m_buffer; };
+		Uint32* getBuffer1() { return this->m_buffer1; };
+		Uint32* getBuffer2() { return this->m_buffer2; };
 
 		Screen(const std::string &sn) { this->SCREEN_NAME = sn; };
 		~Screen() {
-			delete [] m_buffer;
+			delete [] m_buffer1;
+			delete [] m_buffer2;
 		};
 		void close() {
 			SDL_DestroyWindow(this->m_window);
@@ -103,13 +111,14 @@ class Screen {
 		// IMPLEMENTATION IN CPP FILE
 		bool init();
 		bool processEvents();
-		void update();
+		void update(Uint32 * buffer);
 		void clear() { SDL_RenderClear(m_renderer); };
+		void blur(Uint32 * srcBuffer, Uint32 * tmpBuffer, Uint32 * destBuffer, const size_t &boxWidth);
 		void makeGreyScale(const short &a);
 		void makePlainColour(const Uint8 &red, const Uint8 &green, const Uint8 &blue);
-		void setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue);
-		void setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour);
-		void drawParticles(const Particle *pParticles);
+		void setPixel(const Uint16 &x, const Uint16 &y, const Uint8 &red, const Uint8 &green, const Uint8 &blue, Uint32 * buffer);
+		void setPixel(const Uint16 &x, const Uint16 &y, const Uint32 &colour, Uint32 * buffer);
+		void drawParticles(const Particle *pParticles, Uint32 * buffer);
 
 };
 

@@ -8,6 +8,7 @@ int main()
 	sigIntHandler.sa_handler = util::mySigHandler;
 	sigemptyset(&sigIntHandler.sa_mask);
 	sigIntHandler.sa_flags = 0;
+	sigaction(SIGINT, &sigIntHandler, NULL);
 
 	// SEED RAND
 	srand(time(NULL));
@@ -23,7 +24,7 @@ int main()
 
 	bool quit = false;
 
-	graphics::Swarm swarm(true);
+	graphics::Swarm swarm(true, true, 2);
 
 	// MAKE SCREEN BLACK
 	screen.makePlainColour(0, 0, 0);
@@ -48,16 +49,17 @@ int main()
 			count = 0;
 		}
 
-		// HANDLE SIGNALS
-		sigaction(SIGINT, &sigIntHandler, NULL);
-
+		// PROCESS SDL EVENTS INTO BOOL QUIT
 		quit = screen.processEvents();
 
 		// UPDATE THE PIXELS
 		swarm.updatePositions();
 		swarm.updateColours();
-		memset(screen.getBuffer(), 0, graphics::Screen::MEMSIZE);
-		screen.drawParticles(swarm.getParticles());
+		// memset(screen.getBuffer1(), 0, graphics::Screen::MEMSIZE);
+		screen.drawParticles(swarm.getParticles(), screen.getBuffer1());
+		// memset(screen.getBuffer2(), 0, graphics::Screen::MEMSIZE);
+		screen.blur(screen.getBuffer1(), screen.getBuffer2(), screen.getBuffer1(), 3);
+		screen.update(screen.getBuffer1());
 	}
 
 	screen.close();
