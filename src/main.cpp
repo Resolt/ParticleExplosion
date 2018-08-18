@@ -24,7 +24,7 @@ int main()
 
 	bool quit = false;
 
-	graphics::Swarm swarm(true, true, 2);
+	graphics::Swarm swarm(true, true, 1);
 
 	// MAKE SCREEN BLACK
 	screen.makePlainColour(0, 0, 0);
