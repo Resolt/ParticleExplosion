@@ -28,8 +28,26 @@ int main()
 	// MAKE SCREEN BLACK
 	screen.makePlainColour(0, 0, 0);
 
+	// FPS CONTAINERS
+	size_t tick = 0;
+	Uint32 pel = SDL_GetTicks();
+	Uint32 cel;
+	size_t count = 0;
+
 	while(!quit)
 	{
+		// GET SOME FPS
+		count++;
+		cel = SDL_GetTicks();
+		tick += cel - pel;
+		pel = cel;
+		if(tick > 1000)
+		{
+			std::cout << "FPS: " << (double)count/((double)tick/1000) << std::endl;
+			tick = 0;
+			count = 0;
+		}
+
 		// HANDLE SIGNALS
 		sigaction(SIGINT, &sigIntHandler, NULL);
 
@@ -40,9 +58,6 @@ int main()
 		swarm.updateColours();
 		memset(screen.getBuffer(), 0, graphics::Screen::MEMSIZE);
 		screen.drawParticles(swarm.getParticles());
-
-		// WAIT FOR AN AMOUNT OF MILISECONDS
-		SDL_Delay(33);
 	}
 
 	screen.close();

@@ -19,21 +19,27 @@ class Particle {
 
 	private:
 
+		static constexpr double speedMod = 0.05;
+
 		Uint32 colour;
 
 	public:
 
-		double velocity = ((double)rand()/(double)RAND_MAX) * 2.5 + 0.5; // SET VELOCITY BETWEEN 0.5 and 3.0
-		double rad = ((double)rand()/(double)RAND_MAX) * 2 * M_PI; // SET RANDOM DIRECTION OF MOVEMENT
+		double velocity;
+		double rad;
 		double pos_x;
 		double pos_y;
+		double h_speed;
+		double v_speed;
+
+		bool isOut = false;
 
 		Particle() {};
 		~Particle() {};
+		void init(const bool &explosion);
 		void updateColour();
-		void updatePos();
+		void updatePos(const size_t &tdiff);
 		void setColour(const Uint8 & red, const Uint8 &green, const Uint8 &blue) { this->colour = formatColour(red, green, blue); };
-		void setPos(const bool &explosion);
 		Uint32 getColour() const { return this->colour; };
 
 };
@@ -43,12 +49,16 @@ class Swarm {
 	private:
 
 		Particle * const m_particles = new Particle[NPARTICLES];
+		Uint32 elapsed = SDL_GetTicks();
+		size_t tdiff;
+
+		void updateElapsed();
 
 	public:
 
-		static const size_t NPARTICLES = 5000;
+		static const size_t NPARTICLES = 30000;
 
-		Swarm(const bool &explosion) { for(size_t i = 0; i < NPARTICLES; i++) { m_particles[i].setPos(explosion); }; };
+		Swarm(const bool &explosion) { for(size_t i = 0; i < NPARTICLES; i++) { m_particles[i].init(explosion); }; };
 		~Swarm() { delete [] m_particles; };
 		Particle * const getParticles() const { return m_particles; };
 		void updatePositions();

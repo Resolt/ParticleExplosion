@@ -112,12 +112,44 @@ void Screen::drawParticles(const Particle *pParticles)
 {
 	for(size_t i = 0; i < Swarm::NPARTICLES; i++)
 	{
-		this->setPixel((Uint16)round(pParticles[i].pos_x), (Uint16)round(pParticles[i].pos_y), pParticles[i].getColour());
+		if(!pParticles[i].isOut)
+		{
+			this->setPixel((Uint16)round(pParticles[i].pos_x), (Uint16)round(pParticles[i].pos_y), pParticles[i].getColour());
+		}
 	}
 	this->update();
 }
 
 // PARTICLE
+
+void Particle::init(const bool &explosion)
+{
+	this->velocity = ((double)rand()/(double)RAND_MAX) * 2.99 + 0.01; // SET VELOCITY BETWEEN 0.5 and 3.0
+	this->rad = ((double)rand()/(double)RAND_MAX) * 2 * M_PI; // SET RANDOM DIRECTION OF MOVEMENT
+	this->h_speed = cos(this->rad) * this->velocity;
+	this->v_speed = sin(this->rad) * this->velocity;
+
+	if(explosion)
+	{
+		this->pos_x = (double)SCREEN_WIDTH/2;
+		this->pos_y = (double)SCREEN_HEIGHT/2;
+		// this->pos_x = ((double)rand()/(double)RAND_MAX) * (double)SCREEN_WIDTH * 0.005 + (double)SCREEN_WIDTH / 2.01;
+		// this->pos_y = ((double)rand()/(double)RAND_MAX) * (double)SCREEN_HEIGHT * 0.005 + (double)SCREEN_HEIGHT / 2.01;
+		// this->velocity =
+		// 	(sqrt(pow(std::abs((int)this->pos_x - (int)SCREEN_WIDTH/2), 2) + pow(std::abs((int)this->pos_y - (int)SCREEN_WIDTH/2), 2)) /
+		// 	((SCREEN_WIDTH + SCREEN_HEIGHT) / 2)) * 1;
+		// this->rad = cos((SCREEN_HEIGHT/2 - this->pos_y) / (SCREEN_WIDTH/2 - this->pos_x));
+		// if(this->pos_x < SCREEN_WIDTH/2)
+		// {
+		// 	this->rad = M_PI - this->rad;
+		// }
+	}
+	else
+	{
+		this->pos_x = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_WIDTH - 1 - velocity*2) + velocity; // SET RANDOM POSITION
+		this->pos_y = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_HEIGHT - 1 - velocity*2) + velocity;
+	}
+}
 
 void Particle::updateColour()
 {
@@ -130,46 +162,42 @@ void Particle::updateColour()
 	this->colour = formatColour(red, green, blue);
 }
 
-void Particle::updatePos()
+void Particle::updatePos(const size_t &tdiff)
 {
+	// TEMPORARY VALUES
+	double h_dist = this->h_speed * tdiff * this->speedMod;
+	double v_dist = this->v_speed * tdiff * this->speedMod;
+
+	bool setOut = false;
+
+	this->pos_x += h_dist;
+	this->pos_y += v_dist;
+
 	// UPDATE DIRECTION RADIAN BASED ON HORISONTAL MOVEMENT
-	if(this->pos_x <= this->velocity || this->pos_x >= (double)SCREEN_WIDTH-1-this->velocity)
+	if(this->pos_x < 0 || this->pos_x > SCREEN_WIDTH - 1)
 	{
-		this->rad = M_PI - this->rad;
+		this->h_speed = -this->h_speed;
+		setOut = true;
 	}
 
 	// UPDATE DIRECTION RADIAN BASED ON VERTICAL MOVEMENT
-	if(this->pos_y <= this->velocity || this->pos_y >= (double)SCREEN_HEIGHT-1-this->velocity)
+	if(this->pos_y < 0 || this->pos_y > SCREEN_HEIGHT - 1)
 	{
-		this->rad = (2 * M_PI) - this->rad;
+		this->v_speed = -this->v_speed;
+		setOut = true;
 	}
 
-	// UPDATE POSITION
-	this->pos_x += cos(this->rad) * (double)this->velocity;
-	this->pos_y += sin(this->rad) * (double)this->velocity;
-}
-
-void Particle::setPos(const bool &explosion)
-{
-	if(explosion)
-	{
-		this->pos_x = ((double)rand()/(double)RAND_MAX) * (double)SCREEN_WIDTH * 0.05 + (double)SCREEN_WIDTH / 2.1;
-		this->pos_y = ((double)rand()/(double)RAND_MAX) * (double)SCREEN_HEIGHT * 0.05 + (double)SCREEN_HEIGHT / 2.1;
-	}
-	else
-	{
-		this->pos_x = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_WIDTH - 1 - velocity*2) + velocity; // SET RANDOM POSITION
-		this->pos_y = ((double)rand()/(double)RAND_MAX) * ((double)SCREEN_HEIGHT - 1 - velocity*2) + velocity;
-	}
+	this->isOut = setOut;
 }
 
 // SWARM
 
 void Swarm::updatePositions()
 {
+	this->updateElapsed();
 	for(size_t i = 0; i < NPARTICLES; i++)
 	{
-		m_particles[i].updatePos();
+		m_particles[i].updatePos(this->tdiff);
 	}
 }
 
@@ -179,6 +207,15 @@ void Swarm::updateColours()
 	{
 		m_particles[i].updateColour();
 	}
+}
+
+void Swarm::updateElapsed()
+{
+	Uint32 celapsed = SDL_GetTicks();
+	this->tdiff = (size_t)(celapsed - this->elapsed);
+	this->elapsed = celapsed;
+
+	// std::cout << this->elapsed << std::endl;
 }
 
 } /*namespace graphics*/
